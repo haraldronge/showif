@@ -1,7 +1,7 @@
 # General Plugin Info do not edit
 base   showif
 author Harald Ronge
-email  harald@turtur.nl
+email  harald[at]turtur.nl
 date   2013-10-15
 name   ShowIf Plugin
 desc   Show text if some condition is true.
