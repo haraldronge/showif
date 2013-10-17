@@ -1,0 +1,167 @@
+<?php
+
+/**
+ * All DokuWiki plugins to extend the parser/rendering mechanism
+ * need to inherit from this class
+ */
+
+// must be run within DokuWiki
+if(!defined('DOKU_INC')) die();
+
+if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
+require_once(DOKU_PLUGIN.'syntax.php');
+
+/**
+ * All DokuWiki plugins to extend the parser/rendering mechanism
+ * need to inherit from this class
+ */
+class syntax_plugin_showif extends DokuWiki_Syntax_Plugin {
+
+/**
+ * return some info
+ */
+function getInfo(){
+    return array(
+        'author' => 'Harald Ronge',
+        'email'  => 'harald[at]turtur[.]nl',
+        'date'   => '2013-10-15',
+        'name'   => 'showif Plugin',
+        'desc'   => 
+'Shows text only if all of some conditions are true. Basic markup will be shown, but heading-markup is ignored.
+Based on plugin nodisp from Myron Turner.
+
+Admins and Managers will always see everything.
+
+Syntax is <showif [condition1], [condition2], ...>[text]</showif>
+
+Supported conditions are:
+
+1. isloggedin
+2. isnotloggedin
+3. mayonlyread
+4. mayatleastread
+5. mayedit
+6. isadmin
+
+Administrators will always see everything except mayonlyread.
+Not all combinations are useful ;-)
+	
+',
+        'url'    => 'http://www.turtur.nl',
+    );
+}
+
+//new function
+function accepts($mode){
+	return true;
+}
+    
+function getType(){ return 'container'; } //was formatting
+function getPType(){ return 'stack'; }
+function getAllowedTypes() { return array(
+            'container',
+            'formatting',
+            'substition',
+            'protected',
+            'disabled',
+            'paragraphs',
+            'baseonly' //new
+); 
+}   
+function getSort(){ return 196; } //was 168
+function connectTo($mode) {		
+	$this->Lexer->addEntryPattern('<showif.*?>(?=.*?</showif>)',$mode,'plugin_showif'); 
+}
+function postConnect() { $this->Lexer->addExitPattern('</showif>','plugin_showif'); }
+
+
+/**
+ * Handle the match
+     */
+    function handle($match, $state, $pos, &$handler){
+
+        switch ($state) {
+          case DOKU_LEXER_ENTER : 
+		    // remove <showif and >
+			$conditions = trim(substr($match, 8, -1));
+			// explode wanted auths
+			$this->conditions = explode(",",$conditions);
+
+			// FIXME remember conditions here
+
+			$ReWriter = new Doku_Handler_Nest($handler->CallWriter,'plugin_showif');
+			$handler->CallWriter = & $ReWriter;
+			// don't add any plugin instruction:
+            return false;
+
+          case DOKU_LEXER_UNMATCHED :
+                // unmatched data is cdata
+                $handler->_addCall('cdata', array($match), $pos);
+                // don't add any plugin instruction:
+                return false;
+                
+          case DOKU_LEXER_EXIT :
+               // get all calls we intercepted
+                $calls = $handler->CallWriter->calls;
+
+                // switch back to the old call writer
+                $ReWriter = & $handler->CallWriter;
+                $handler->CallWriter = & $ReWriter->CallWriter;
+
+                // return a plugin instruction
+                return array($state, $calls, $this->conditions);
+        }
+
+        return false;
+    }
+
+    /**
+     * Create output
+     */
+    function render($mode, &$renderer, $data) {
+        global $INFO;
+        
+        if($mode == 'xhtml'){
+            $renderer->nocache(); // disable caching
+	        list($state, $calls, $conditions) = $data;
+    	    if($state != DOKU_LEXER_EXIT) return true;
+           
+			$show = FALSE;
+			//$i = 0;
+			// Loop through conditions
+			foreach($conditions as $val) { 
+				// All conditions have to be true
+				if
+				(
+					(($val == "mayedit") && (auth_quickaclcheck($INFO['id'])) >= AUTH_EDIT)
+					||
+					//mayonlyread will be hidden for an administrator!
+					(($val == "mayonlyread") && (auth_quickaclcheck($INFO['id'])) == AUTH_READ)
+					||
+					(($val == "mayatleastread") && (auth_quickaclcheck($INFO['id'])) >= AUTH_READ)
+					||
+					($val == "isloggedin" && ($_SERVER['REMOTE_USER']))
+					||
+					($val == "isnotloggedin" && !($_SERVER['REMOTE_USER']))
+					||
+					(($val == "isadmin") && ($INFO['isadmin'] || $INFO['ismanager'] ))
+				) $show = TRUE;
+				else {$show = FALSE; break;}
+			}
+			
+			if ($show) {
+				foreach($calls as $i){
+					if(method_exists($renderer,$i[0])){
+						call_user_func_array(array($renderer,$i[0]),$i[1]);
+					}
+				}
+			}			
+            return true;
+        }
+        return false;
+    }
+
+
+ 
+}
+?>
