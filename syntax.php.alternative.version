@@ -1,6 +1,13 @@
 <?php
 
 /**
+ * This actually looks like the better implementation but I run into some caching issues on Angua with this. On Adora Belle it seemed ok.
+ * It is possible that the problems were spurious and only due to an unnatural situation when switching identities and rights in testing
+ * Test before adopting this code!
+ */
+
+
+/**
  * All DokuWiki plugins to extend the parser/rendering mechanism
  * need to inherit from this class
  */
