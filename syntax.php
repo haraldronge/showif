@@ -45,7 +45,7 @@ Administrators will always see everything except mayonlyread.
 Not all combinations are useful ;-)
 	
 ',
-        'url'    => 'http://www.turtur.nl',
+        'url'    => 'https://www.dokuwiki.org/plugin:showif',
     );
 }
 
