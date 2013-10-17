@@ -3,7 +3,7 @@
 Shows text only if all of some conditions are true.
 Lazy hiding based on plugin nodisp from Myron Turner.
 
-Syntax is <showif [condition1], [condition2], ...>[text]</showif>
+Syntax is \<showif [condition1], [condition2], ...\>[text]\</showif\>
 
 Supported conditions are:
 
