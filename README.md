@@ -17,5 +17,5 @@ Supported conditions are:
 Administrators will always see everything except mayonlyread.
 Not all combinations are useful ;-)
 
-(c) 2013 by Harald Ronge <harald@turtur.nl>
+(c) 2013 by Harald Ronge <harald[at]turtur.nl>
 See COPYING for license info.
