@@ -1,22 +1,21 @@
 ====== ShowIf Plugin for DokuWiki ======
 
-Shows text only if some condition is true.
-Based on plugin nodisp from Myron Turner.
+Shows text only if all of some conditions are true.
+Lazy hiding based on plugin nodisp from Myron Turner.
 
-Admins and Managers will always see everything.
-
-Syntax is <showif [condition]>...</showif>
+Syntax is <showif [condition1], [condition2], ...>[text]</showif>
 
 Supported conditions are:
 
-1. mayedit
-2. loggedin
+1. isloggedin
+2. isnotloggedin
 3. mayonlyread
-4. notloggedin
+4. mayatleastread
+5. mayedit
+6. isadmin
 
-All documentation for the ShowIf Plugin is available online at:
-
-  * http://dokuwiki.org/plugin:showif
+Administrators will always see everything except mayonlyread.
+Not all combinations are useful ;-)
 
 (c) 2013 by Harald Ronge <harald@turtur.nl>
 See COPYING for license info.
