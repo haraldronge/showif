@@ -68,7 +68,7 @@ function postConnect() { $this->Lexer->addExitPattern('</showif>','plugin_showif
 /**
  * Handle the match
      */
-    function handle($match, $state, $pos, &$handler){
+    function handle($match, $state, $pos, Doku_Handler $handler){
 
 
         switch ($state) {
@@ -87,7 +87,7 @@ function postConnect() { $this->Lexer->addExitPattern('</showif>','plugin_showif
     /**
      * Create output
      */
-    function render($mode, &$renderer, $data) {
+    function render($mode, Doku_Renderer $renderer, $data) {
         global $INFO;
         
         if($mode == 'xhtml'){
